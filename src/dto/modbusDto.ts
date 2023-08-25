@@ -10,6 +10,7 @@ import {
 //slave id
 export enum slaveID {
   DOOR = 2, // 포트 1번
+  AIR_CONDITIONER = -1, //
   AIR_PURIFIER = 7, // 포트 2번
   LIGHT_INNER = 1, // 포트 7번
   LIGHT_OUTER = 3, // 포트 8번
