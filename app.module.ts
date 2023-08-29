@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config/dist/config.module";
 import { ModbusModule } from "src/modbus/modbus.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -7,10 +6,14 @@ import { MqttModule } from "src/mqtt/mqtt.module";
 import { DeviceModule } from "src/device/device.module";
 import { TaskModule } from "src/task/task.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { ConfigModule } from "@nestjs/config";
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: ".env",
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type:
         process.env.DB_TYPE == "mysql"

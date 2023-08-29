@@ -6,12 +6,7 @@ import {
   ApiQuery,
   ApiCreatedResponse,
 } from "@nestjs/swagger";
-import {
-  getCoilDto,
-  setCoilDto,
-  setResisterDto,
-  slaveID,
-} from "src/dto/modbusDto";
+import { getCoilDto, setCoilDto, setResisterDto } from "src/dto/modbusDto";
 import { ModbusService } from "./modbus.service";
 import { Request } from "express";
 

@@ -6,7 +6,6 @@ import { DeviceSlaveModel } from "src/device/models/device_slave.model";
 import { Inject, Injectable, forwardRef } from "@nestjs/common";
 import { ModbusService } from "src/modbus/modbus.service";
 import { DeviceService } from "./device.service";
-import { slaveID } from "src/dto/modbusDto";
 
 @Injectable()
 export class ShareBoothService {
@@ -25,9 +24,7 @@ export class ShareBoothService {
 
   cacheDataTime: any;
   welcome_cacheDataTime: any;
-  //날찌 전달 10분단위로 설정
-  TIMEDURATION = 10;
-  WELCOME_TIMEDURATION = 23;
+
   time_min = null;
   time_max = null;
   close5_cache = false;
@@ -40,6 +37,16 @@ export class ShareBoothService {
 
   path = require("path");
   sound = require("sound-play");
+
+  public slaveID = {
+    DOOR: parseInt(process.env.ADDRESS_DOOR), //2, // 포트 1번
+    AIR_CONDITIONER: parseInt(process.env.ADDRESS_AIR_CONDITIONER), //-1, //
+    AIR_PURIFIER: parseInt(process.env.ADDRESS_AIR_PURIFIER), //7, // 포트 2번
+    LIGHT_INNER: parseInt(process.env.ADDRESS_LIGHT_INNER), //1, // 포트 7번
+    LIGHT_OUTER: parseInt(process.env.ADDRESS_LIGHT_OUTER), //3, // 포트 8번
+    AWNING: parseInt(process.env.ADDRESS_AWNING), //-1,
+    BLIEND: parseInt(process.env.ADDRESS_BLIEND), //-1,
+  };
 
   constructor(
     @Inject(forwardRef(() => ModbusService))
@@ -209,7 +216,7 @@ export class ShareBoothService {
     if (this.AirConditioner == null)
       this.AirConditioner = await this.deviceService.getSlave("AirConditioner");
 
-    await this.modbusService.control(slaveID.AIR_CONDITIONER, value);
+    await this.modbusService.control(this.slaveID.AIR_CONDITIONER, value);
     console.log("에어컨이", value, " 되었습니다.");
   }
 
@@ -217,14 +224,14 @@ export class ShareBoothService {
     if (this.Door == null)
       this.Door = await this.deviceService.getSlave("Door");
 
-    await this.modbusService.control(slaveID.DOOR, value);
+    await this.modbusService.control(this.slaveID.DOOR, value);
     console.log("도어가", value, " 되었습니다.");
   }
   async lightControl(value) {
     if (this.Light == null)
       this.Light = await this.deviceService.getSlave("Light");
 
-    await this.modbusService.control(slaveID.LIGHT_INNER, value);
+    await this.modbusService.control(this.slaveID.LIGHT_INNER, value);
     console.log("내부조명이", value, " 되었습니다.");
   }
 
@@ -232,7 +239,7 @@ export class ShareBoothService {
     if (this.SBAwning == null)
       this.SBAwning = await this.deviceService.getSlave("SBAwning");
 
-    await this.modbusService.control(slaveID.AWNING, value);
+    await this.modbusService.control(this.slaveID.AWNING, value);
     console.log("어닝이", value, " 되었습니다.");
   }
 
@@ -240,7 +247,7 @@ export class ShareBoothService {
     if (this.Blind == null)
       this.Blind = await this.deviceService.getSlave("Blind");
     //this.modbusService.blindControl(this.Blind, blind);
-    await this.modbusService.control(slaveID.BLIEND, value);
+    await this.modbusService.control(this.slaveID.BLIEND, value);
     console.log("블라인더", value, " 되었습니다.");
   }
 
@@ -326,7 +333,7 @@ export class ShareBoothService {
     const url = "http://sharebooth.spacetalk.co.kr/v1/booth/slave-status";
 
     const slave_data = {
-      slaveId: device[0].id,
+      slaveID: device[0].id,
       status: status.status,
       status_checkDate: status.checkDate,
     };
