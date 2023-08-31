@@ -4,7 +4,7 @@ import ModbusRTU from "modbus-serial";
 @Injectable()
 export class ModbusService {
   private client: ModbusRTU;
-
+  public COM_PORT = process.env.COM_PORT;
   public slaveID = {
     DOOR: parseInt(process.env.ADDRESS_DOOR), //2, // 포트 1번
     AIR_CONDITIONER: parseInt(process.env.ADDRESS_AIR_CONDITIONER), //-1, //
@@ -20,9 +20,10 @@ export class ModbusService {
     //장비 연결 안했을시 주석처리 필요
     //this.connect();
   }
-  async connect(): Promise<void> {
+  connect() {
+    console.log("Modbus connect port ", this.COM_PORT);
     this.client = new ModbusRTU();
-    this.client.connectRTUBuffered("/dev/ttyUSB0", {
+    this.client.connectRTUBuffered(this.COM_PORT, {
       baudRate: 9600,
       parity: "even",
       stopBits: 1,
@@ -31,64 +32,72 @@ export class ModbusService {
     this.client.setID(1); // Modbus slave ID
   }
 
-  async disconnect(): Promise<void> {
-    await this.client.close;
+  disconnect() {
+    this.client.close;
   }
 
   //시스템 on 1. 문열림, 조명 켜짐, 에어컨 켜짐, 블라이더 내려옴
-  async systemOn() {
+  systemOn() {
     console.log("this.slaveID.DOOR", this.slaveID);
     // 문열림
-    await this.writeCoil(this.slaveID.DOOR, true);
+    this.writeCoil(this.slaveID.DOOR, true);
     //조명 켜짐
-    await this.writeCoil(this.slaveID.LIGHT_INNER, true);
+    setTimeout(() => {
+      this.writeCoil(this.slaveID.LIGHT_INNER, true);
+    }, this.Deleay);
+
     //에어컨 켜짐
-    await this.writeCoil(this.slaveID.AIR_CONDITIONER, true);
+    setTimeout(() => {
+      this.writeCoil(this.slaveID.AIR_CONDITIONER, true);
+    }, this.Deleay);
+
     //블라인더 내려옴
-    await this.writeCoil(this.slaveID.BLIEND, false);
+    setTimeout(() => {
+      this.writeCoil(this.slaveID.BLIEND, false);
+    }, this.Deleay * 2);
   }
 
   //시스템 off 1. 문열림 조명 꺼짐, 에어컨 꺼짐 ,블라인더 올라옴
-  async systemOff() {
+  systemOff() {
     // 문열림
-    await this.writeCoil(this.slaveID.DOOR, true);
+    this.writeCoil(this.slaveID.DOOR, true);
     //조명 꺼짐
-    await this.writeCoil(this.slaveID.LIGHT_INNER, false);
+    this.writeCoil(this.slaveID.LIGHT_INNER, false);
     //에어컨 꺼짐
-    await this.writeCoil(this.slaveID.AIR_CONDITIONER, false);
+    this.writeCoil(this.slaveID.AIR_CONDITIONER, false);
     //블라인더 올라옴
-    await this.writeCoil(this.slaveID.BLIEND, true);
+    this.writeCoil(this.slaveID.BLIEND, true);
   }
 
-  async control(slave, value) {
+  control(slave, value) {
     switch (slave) {
       case this.slaveID.DOOR:
-        await this.writeCoil(this.slaveID.DOOR, value);
+        this.writeCoil(this.slaveID.DOOR, value);
         break;
       case this.slaveID.AIR_CONDITIONER:
-        await this.writeCoil(this.slaveID.AIR_CONDITIONER, value);
+        this.writeCoil(this.slaveID.AIR_CONDITIONER, value);
         break;
       case this.slaveID.AIR_PURIFIER:
-        await this.writeCoil(this.slaveID.AIR_PURIFIER, value);
+        this.writeCoil(this.slaveID.AIR_PURIFIER, value);
         break;
       case this.slaveID.LIGHT_INNER:
-        await this.writeCoil(this.slaveID.LIGHT_INNER, value);
+        this.writeCoil(this.slaveID.LIGHT_INNER, value);
         break;
       case this.slaveID.LIGHT_OUTER:
-        await this.writeCoil(this.slaveID.LIGHT_OUTER, value);
+        this.writeCoil(this.slaveID.LIGHT_OUTER, value);
         break;
       case this.slaveID.AWNING:
-        await this.writeCoil(this.slaveID.AWNING, value);
+        this.writeCoil(this.slaveID.AWNING, value);
         break;
       case this.slaveID.BLIEND:
-        await this.writeCoil(this.slaveID.BLIEND, value);
+        this.writeCoil(this.slaveID.BLIEND, value);
         break;
     }
   }
 
-  async writeCoil(address: number, value: boolean): Promise<void> {
+  writeCoil(address: number, value: boolean) {
     try {
-      await this.client.writeCoil(address, value);
+      this.client.writeCoil(address, value);
       console.log(
         `Successfully wrote coil at address ${address} with value ${value}`
       );
@@ -96,9 +105,9 @@ export class ModbusService {
       console.error(`Error writing coil: ${error}`);
     }
   }
-  async readCoil(address: number, lenght: number): Promise<void> {
+  readCoil(address: number, lenght: number) {
     try {
-      await this.client.readCoils(address, lenght);
+      this.client.readCoils(address, lenght);
       console.log(
         `Successfully wrote coil at address ${address} with lenght ${lenght}`
       );
@@ -106,9 +115,9 @@ export class ModbusService {
       console.error(`Error writing coil: ${error}`);
     }
   }
-  async writeRegister(address: number, value: number): Promise<void> {
+  writeRegister(address: number, value: number) {
     try {
-      await this.client.writeRegister(address, value);
+      this.client.writeRegister(address, value);
       console.log(
         `Successfully wrote coil at address ${address} with value ${value} `
       );

@@ -188,7 +188,7 @@ export class ShareBoothService {
       this.SystemControl = await this.deviceService.getSlave("SystemControl");
 
     if (value == true || value == "true") await this.modbusService.systemOn();
-    else await this.modbusService.systemOff();
+    else this.modbusService.systemOff();
 
     console.log("시스템이", value, " 되었습니다.");
   }
@@ -200,14 +200,14 @@ export class ShareBoothService {
     this.close5_cache = false;
     this.close_cache = false;
 
-    await this.modbusService.systemOn();
+    this.modbusService.systemOn();
     console.log("시스템 운영시작 되었습니다.");
   }
   async systemOff() {
     if (this.SystemControl == null)
       this.SystemControl = await this.deviceService.getSlave("SystemControl");
 
-    await this.modbusService.systemOff();
+    this.modbusService.systemOff();
 
     console.log("시스템 운영종료 되었습니다.");
   }
@@ -216,7 +216,7 @@ export class ShareBoothService {
     if (this.AirConditioner == null)
       this.AirConditioner = await this.deviceService.getSlave("AirConditioner");
 
-    await this.modbusService.control(this.slaveID.AIR_CONDITIONER, value);
+    this.modbusService.control(this.slaveID.AIR_CONDITIONER, value);
     console.log("에어컨이", value, " 되었습니다.");
   }
 
@@ -224,14 +224,14 @@ export class ShareBoothService {
     if (this.Door == null)
       this.Door = await this.deviceService.getSlave("Door");
 
-    await this.modbusService.control(this.slaveID.DOOR, value);
+    this.modbusService.control(this.slaveID.DOOR, value);
     console.log("도어가", value, " 되었습니다.");
   }
   async lightControl(value) {
     if (this.Light == null)
       this.Light = await this.deviceService.getSlave("Light");
 
-    await this.modbusService.control(this.slaveID.LIGHT_INNER, value);
+    this.modbusService.control(this.slaveID.LIGHT_INNER, value);
     console.log("내부조명이", value, " 되었습니다.");
   }
 
@@ -239,7 +239,7 @@ export class ShareBoothService {
     if (this.SBAwning == null)
       this.SBAwning = await this.deviceService.getSlave("SBAwning");
 
-    await this.modbusService.control(this.slaveID.AWNING, value);
+    this.modbusService.control(this.slaveID.AWNING, value);
     console.log("어닝이", value, " 되었습니다.");
   }
 
@@ -247,7 +247,7 @@ export class ShareBoothService {
     if (this.Blind == null)
       this.Blind = await this.deviceService.getSlave("Blind");
     //this.modbusService.blindControl(this.Blind, blind);
-    await this.modbusService.control(this.slaveID.BLIEND, value);
+    this.modbusService.control(this.slaveID.BLIEND, value);
     console.log("블라인더", value, " 되었습니다.");
   }
 
